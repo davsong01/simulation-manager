@@ -3,12 +3,11 @@ name: Auto Release Plugin
 on:
   push:
     branches:
-      - "release" # Triggers exactly when you push to the 'release' branch
+      - "release"
 
 jobs:
   release:
     runs-on: ubuntu-latest
-    # Added permissions to allow the action to create tags and releases
     permissions:
       contents: write
 
@@ -16,41 +15,60 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0 # Fetches all history so tags can be pushed properly
+          fetch-depth: 0 # Essential to see previous tags for comparison
 
-      - name: Get version from plugin file
-        id: get_version
+      - name: Version Validation
+        id: check_version
         run: |
-          # Finds 'Version: X.X.X' in your main plugin file
-          VERSION=$(grep -m 1 "Version:" simulation-manager.php | awk '{print $NF}')
-          echo "version=$VERSION" >> $GITHUB_OUTPUT
+          # 1. Extract version from your main PHP file
+          NEW_VERSION=$(grep -m 1 "Version:" simulation-manager.php | awk '{print $NF}')
+          
+          # 2. Get the most recent tag from Git. Default to 0.0.0 if no tags exist.
+          LATEST_TAG=$(git describe --tags --abbrev=0 2>/dev/null | sed 's/^v//' || echo "0.0.0")
+
+          echo "Current file version: $NEW_VERSION"
+          echo "Latest GitHub tag: $LATEST_TAG"
+
+          # 3. Use sort -V (Version Sort) to determine the highest version
+          # This handles 1.10.0 being higher than 1.2.0 correctly.
+          HIGHEST=$(printf "$LATEST_TAG\n$NEW_VERSION" | sort -V | tail -n1)
+
+          if [ "$NEW_VERSION" == "$LATEST_TAG" ]; then
+            echo "STATUS=equal" >> $GITHUB_ENV
+            echo "::notice::Version $NEW_VERSION is the same as the current tag. Skipping release."
+          elif [ "$HIGHEST" == "$LATEST_TAG" ]; then
+            echo "STATUS=lower" >> $GITHUB_ENV
+            echo "::error::Version $NEW_VERSION is LOWER than $LATEST_TAG. Release aborted."
+            exit 1 # Fails the Action so you get a notification
+          else
+            echo "STATUS=higher" >> $GITHUB_ENV
+            echo "::notice::New version detected ($NEW_VERSION). Proceeding with release."
+          fi
+          
+          echo "version=$NEW_VERSION" >> $GITHUB_OUTPUT
 
       - name: Create Git Tag
+        if: env.STATUS == 'higher'
         run: |
           git config user.name "github-actions"
           git config user.email "github-actions@github.com"
-          # Check if tag already exists to avoid errors on re-runs
-          if git rev-parse "v${{ steps.get_version.outputs.version }}" >/dev/null 2>&1; then
-            echo "Tag v${{ steps.get_version.outputs.version }} already exists. Skipping tag creation."
-          else
-            git tag v${{ steps.get_version.outputs.version }}
-            git push origin v${{ steps.get_version.outputs.version }}
-          fi
+          git tag v${{ steps.check_version.outputs.version }}
+          git push origin v${{ steps.check_version.outputs.version }}
 
       - name: Create ZIP archive
+        if: env.STATUS == 'higher'
         run: |
-          # ZIPs everything but excludes dev/git junk
-          # We name the ZIP after the plugin slug for WP compatibility
+          # Ensure we name the zip simulation-manager.zip to match your plugin slug
           zip -r simulation-manager.zip . -x "*.git*" "*.github*" "node_modules/*" ".gitignore"
 
       - name: Create GitHub Release
+        if: env.STATUS == 'higher'
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: v${{ steps.get_version.outputs.version }}
-          name: Release v${{ steps.get_version.outputs.version }}
+          tag_name: v${{ steps.check_version.outputs.version }}
+          name: Release v${{ steps.check_version.outputs.version }}
+          body: "Automatic release for version ${{ steps.check_version.outputs.version }}"
           files: simulation-manager.zip
-          draft: false
-          prerelease: false
-          generate_release_notes: true # Automatically summarizes your commits
+          generate_release_notes: true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
