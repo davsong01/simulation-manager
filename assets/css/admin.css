@@ -1,0 +1,39 @@
+body .simmgr-modal.hidden { display: none; }
+.simmgr-modal { background: rgba(0,0,0,.4); position: fixed; inset: 0; z-index: 9999; overflow: auto; padding: 50px 20px; }
+.simmgr-modal-content { background: #fff; border-radius: 4px; padding: 24px; max-width: 800px; margin: 0 auto; box-shadow: 0 10px 30px rgba(0,0,0,.15); }
+.simmgr-close-button { margin-left: 10px; }
+.simmgr-actions { display: flex; flex-direction: column; gap: 5px; align-items: flex-start; width: 100%; }
+.simmgr-actions .button { width: auto; margin: 0; }
+.button-small { font-size: 12px; padding: 4px 8px; line-height: 1.2; }
+.button-danger { background: #d63638 !important; border-color: #d63638 !important; color: #fff !important; }
+.button-danger:hover { background: #b32d2e !important; border-color: #b32d2e !important; }
+.simmgr-notice { margin-top: 12px; padding: 12px 14px; border-radius: 4px; display: block; border-left: 4px solid; }
+.simmgr-success { background: #f0f9f0; color: #2d5c2d; border-left-color: #00a32a; }
+.simmgr-error { background: #fdf2f2; color: #7d2a2a; border-left-color: #d63638; }
+.simmgr-modal .required { color: #d54e21; }
+.simmgr-folder-tree ul { list-style: none; margin: 0; padding-left: 20px; }
+.simmgr-folder-tree li { margin-bottom: 6px; }
+.simmgr-folder-tree .folder { font-weight: 600; }
+.simmgr-folder-tree .file { color: #555; }
+/* Simple CSS Spinner */
+.simmgr-spinner {
+    display: inline-block;
+    width: 16px;
+    height: 16px;
+    margin-left: 8px;
+    border: 2px solid rgba(255,255,255,.3);
+    border-radius: 50%;
+    border-top-color: #fff;
+    animation: simmgr-spin 1s ease-in-out infinite;
+    vertical-align: middle;
+}
+
+@keyframes simmgr-spin {
+    to { transform: rotate(360deg); }
+}
+
+/* State management */
+.button.is-loading {
+    pointer-events: none;
+    opacity: 0.8;
+}
