@@ -7,21 +7,6 @@
  * Text Domain: simulation-manager
  */
 
-require 'inc/plugin-update-checker/plugin-update-checker.php';
-use YahnisElsts\PluginUpdateChecker\v5\PucFactory;
-
-$myUpdateChecker = PucFactory::buildUpdateChecker(
-	'https://github.com/davsong01/simulation-manager/', // Your repo URL
-	__FILE__, // Full path to the main plugin file
-	'simulation-manager' // Plugin slug
-);
-
-// Optional: If it's a private repository, you need a GitHub Token
-// $myUpdateChecker->setAuthentication('your-github-personal-access-token');
-
-// Optional: Set the branch (defaults to 'master' or 'main')
-// $myUpdateChecker->setBranch('main');
-
 if ( ! defined( 'ABSPATH' ) ) {
     exit;
 }
@@ -44,6 +29,23 @@ add_action( 'wp_ajax_simmgr_get_folder_contents', 'simmgr_handle_folder_contents
 add_action( 'wp_ajax_simmgr_load_simulations', 'simmgr_handle_load_simulations' );
 
 require_once SIMMGR_PLUGIN_DIR . 'admin.php';
+
+
+require_once SIMMGR_PLUGIN_DIR . 'inc/plugin-update-checker/plugin-update-checker.php';
+
+// Integrate auto update
+use YahnisElsts\PluginUpdateChecker\v5\PucFactory;
+$myUpdateChecker = PucFactory::buildUpdateChecker(
+	'https://github.com/davsong01/simulation-manager/', // Your repo URL
+	__FILE__, // Full path to the main plugin file
+	'simulation-manager' // Plugin slug
+);
+
+// Optional: If it's a private repository, you need a GitHub Token
+// $myUpdateChecker->setAuthentication('your-github-personal-access-token');
+
+// Optional: Set the branch (defaults to 'master' or 'main')
+$myUpdateChecker->setBranch('main');
 
 function simmgr_activate_plugin() {
     global $wpdb;
