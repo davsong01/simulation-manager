@@ -1,0 +1,63 @@
+# =========================
+# OS files
+# =========================
+.DS_Store
+Thumbs.db
+
+# =========================
+# Logs
+# =========================
+*.log
+
+# =========================
+# IDE / Editor files
+# =========================
+.idea/
+.vscode/
+*.sublime-project
+*.sublime-workspace
+
+# =========================
+# Node / Frontend assets (if used)
+# =========================
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+dist/
+build/
+
+# =========================
+# Composer dependencies (if used)
+# =========================
+vendor/
+
+# =========================
+# Environment files
+# =========================
+.env
+.env.*
+!.env.example
+
+# =========================
+# WordPress sensitive config (NEVER commit)
+# =========================
+wp-config.php
+
+# =========================
+# Cache / temp files
+# =========================
+cache/
+tmp/
+uploads/
+
+# =========================
+# Testing / coverage
+# =========================
+coverage/
+.phpunit.result.cache
+
+# =========================
+# Optional: compiled assets
+# =========================
+*.map
