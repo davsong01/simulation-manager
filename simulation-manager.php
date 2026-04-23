@@ -2,7 +2,7 @@
 /**
  * Plugin Name: Simulation Manager
  * Description: Admin tool to upload and manage simulation HTML/ZIP packages in a fixed /simulations/ folder.
- * Version: 1.2.1
+ * Version: 1.2.4
  * Author: David Oghi
  * Text Domain: simulation-manager
  */
@@ -16,6 +16,7 @@ define( 'SIMMGR_PLUGIN_DIR', plugin_dir_path( __FILE__ ) );
 define( 'SIMMGR_DB_TABLE', 'simulation' );
 define( 'SIMMGR_LIBRARY_DIR', ABSPATH . 'simulations/' );
 define( 'SIMMGR_LIBRARY_URL', site_url( '/simulations/' ) );
+
 
 register_activation_hook( __FILE__, 'simmgr_activate_plugin' );
 register_deactivation_hook( __FILE__, 'simmgr_deactivate_plugin' );
