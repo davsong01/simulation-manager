@@ -3,39 +3,54 @@ name: Auto Release Plugin
 on:
   push:
     branches:
-      - "release/**"
+      - "release" # Triggers exactly when you push to the 'release' branch
 
 jobs:
   release:
     runs-on: ubuntu-latest
+    # Added permissions to allow the action to create tags and releases
+    permissions:
+      contents: write
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # Fetches all history so tags can be pushed properly
 
       - name: Get version from plugin file
         id: get_version
         run: |
-          VERSION=$(grep -R "Version:" *.php | head -n 1 | sed 's/.*Version:\s*//')
-          echo "VERSION=$VERSION" >> $GITHUB_ENV
+          # Finds 'Version: X.X.X' in your main plugin file
+          VERSION=$(grep -m 1 "Version:" simulation-manager.php | awk '{print $NF}')
           echo "version=$VERSION" >> $GITHUB_OUTPUT
 
       - name: Create Git Tag
         run: |
           git config user.name "github-actions"
           git config user.email "github-actions@github.com"
-          git tag v${{ steps.get_version.outputs.version }}
-          git push origin v${{ steps.get_version.outputs.version }}
+          # Check if tag already exists to avoid errors on re-runs
+          if git rev-parse "v${{ steps.get_version.outputs.version }}" >/dev/null 2>&1; then
+            echo "Tag v${{ steps.get_version.outputs.version }} already exists. Skipping tag creation."
+          else
+            git tag v${{ steps.get_version.outputs.version }}
+            git push origin v${{ steps.get_version.outputs.version }}
+          fi
 
       - name: Create ZIP archive
         run: |
-          zip -r plugin.zip . -x "*.git*" "*.github*" "node_modules/*"
+          # ZIPs everything but excludes dev/git junk
+          # We name the ZIP after the plugin slug for WP compatibility
+          zip -r simulation-manager.zip . -x "*.git*" "*.github*" "node_modules/*" ".gitignore"
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
         with:
           tag_name: v${{ steps.get_version.outputs.version }}
           name: Release v${{ steps.get_version.outputs.version }}
-          files: plugin.zip
+          files: simulation-manager.zip
+          draft: false
+          prerelease: false
+          generate_release_notes: true # Automatically summarizes your commits
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

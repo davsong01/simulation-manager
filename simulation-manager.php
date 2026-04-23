@@ -2,7 +2,7 @@
 /**
  * Plugin Name: Simulation Manager
  * Description: Admin tool to upload and manage simulation HTML/ZIP packages in a fixed /simulations/ folder.
- * Version: 1.2.1
+ * Version: 1.2.2
  * Author: David Oghi
  * Text Domain: simulation-manager
  */
