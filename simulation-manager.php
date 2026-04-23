@@ -11,6 +11,7 @@ if ( ! defined( 'ABSPATH' ) ) {
     exit;
 }
 
+
 define( 'SIMMGR_PLUGIN_FILE', __FILE__ );
 define( 'SIMMGR_PLUGIN_DIR', plugin_dir_path( __FILE__ ) );
 define( 'SIMMGR_DB_TABLE', 'simulation' );
