@@ -11,7 +11,7 @@ require 'inc/plugin-update-checker/plugin-update-checker.php';
 use YahnisElsts\PluginUpdateChecker\v5\PucFactory;
 
 $myUpdateChecker = PucFactory::buildUpdateChecker(
-	'https://github.com/YourUsername/simulation-manager/', // Your repo URL
+	'https://github.com/davsong01/simulation-manager/', // Your repo URL
 	__FILE__, // Full path to the main plugin file
 	'simulation-manager' // Plugin slug
 );
